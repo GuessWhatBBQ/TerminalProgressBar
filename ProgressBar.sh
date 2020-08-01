@@ -1,6 +1,6 @@
 #!/bin/bash
 
-commands=("echo 1" "su dafsdgfsfg" "echo 3" "su adfdaffd" "echo")
+commands=("echo 1" "echo 2" "echo 3" "echo 4" "echo 5" "echo hello")
 
 ignore_errors=0
 
