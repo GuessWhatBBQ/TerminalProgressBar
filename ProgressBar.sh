@@ -21,9 +21,9 @@ while getopts 'it:' PARAMS; do
 		;;
 	t)
 		smoothing_time="$OPTARG"
-		if [ $smoothing_time -le 0 ]
+		if [ $(echo "$smoothing_time < 0" | bc -l) -eq 1 ]
 		then
-			echo "Negative values aren't supported for this option"
+			echo "Negative values not supported for -t"
 			exit 1
 		fi
 		;;
