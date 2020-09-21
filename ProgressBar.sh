@@ -2,7 +2,9 @@
 
 commands=("echo 1" "echo 2" "echo 3" "echo 4" "echo 5" "echo hello")
 
+#Default parameters
 ignore_errors=0
+smoothing_time=0.0
 
 function printCharNTimes () {
 	#Appends a character to the string for a certain number of times
@@ -12,16 +14,23 @@ function printCharNTimes () {
 	done
 }
 
-while getopts 'i' PARAMS; do
+while getopts 'it:' PARAMS; do
   case "$PARAMS" in
     i)
-      ignore_errors=1
-      ;;
-
+		ignore_errors=1
+		;;
+	t)
+		smoothing_time="$OPTARG"
+		if [ $smoothing_time -le 0 ]
+		then
+			echo "Negative values aren't supported for this option"
+			exit 1
+		fi
+		;;
     ?)
-      echo "script usage: $(basename $0) [-i]" >&2
-      exit 1
-      ;;
+		echo "script usage: $(basename $0) [-i]" >&2
+		exit 1
+		;;
   esac
 done
 
@@ -42,7 +51,7 @@ do
     
     let percentage=($i*100)/$blocks
     printf "Progress: [%3d%%] [%s]\r" "$percentage" "$progressbar"
-    sleep 0.3;
+    sleep $smoothing_time;
     
     # Run each command in array and redirect all output to progressbar.log file in current directory
     $(${commands[$i]} >> progressbar.log 2>&1)
