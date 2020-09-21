@@ -16,7 +16,7 @@ function printCharNTimes () {
 
 while getopts 'it:' PARAMS; do
   case "$PARAMS" in
-    i)
+	i)
 		ignore_errors=1
 		;;
 	t)
@@ -27,7 +27,7 @@ while getopts 'it:' PARAMS; do
 			exit 1
 		fi
 		;;
-    ?)
+	?)
 		echo "script usage: $(basename $0) [-i]" >&2
 		exit 1
 		;;
