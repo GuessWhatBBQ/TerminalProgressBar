@@ -11,11 +11,13 @@ The available options are as follows:
 
 - The `-t` option followed by a number which will be used as the time in seconds that the command waits between executing commands in the array. This serves to mainly smooth the progression of the progressbar and has very little practical purpose. The default is set to 0 seconds.
 
+- The `-l` option followed by the file where all command outputs should be redirected to.
+
 #### Example Usage
 
-The following sets the interval/smoothing time to 0.3 seconds and instructs the script to ignore errors.
+The following sets the interval/smoothing time to 0.3 seconds and instructs the script to ignore errors while redirecting output to the file /tmp/output.log.
 
-`./ProgressBar.sh -t 0.3 -i`
+`./ProgressBar.sh -t 0.3 -i -l /tmp/output.log`
 
 ## Installation
 No special packages are required to use this except maybe `bc` the basic calculator package.
