@@ -5,6 +5,7 @@ commands=("echo 1" "echo 2" "echo 3" "echo 4" "echo 5" "echo hello")
 #Default parameters
 ignore_errors=0
 smoothing_time=0.0
+log_file=progressbar.log
 
 function printCharNTimes () {
 	#Appends a character to the string for a certain number of times
@@ -14,21 +15,24 @@ function printCharNTimes () {
 	done
 }
 
-while getopts 'it:' PARAMS; do
+while getopts 'it:l:' PARAMS; do
   case "$PARAMS" in
 	i)
 		ignore_errors=1
 		;;
 	t)
-		smoothing_time="$OPTARG"
+		smoothing_time=$OPTARG
 		if [ $(echo "$smoothing_time < 0" | bc -l) -eq 1 ]
 		then
 			echo "Negative values not supported for -t"
 			exit 1
 		fi
 		;;
+	l)
+		log_file=$OPTARG
+		;;
 	?)
-		echo "script usage: $(basename $0) [-i]" >&2
+		echo "script usage: $(basename $0) [-i ignore_errors] [-t smoothing_time] [-l log_file]" >&2
 		exit 1
 		;;
   esac
@@ -41,30 +45,30 @@ let blocksize=($barsize+$blocks-1)/$blocks
 for i in $(seq 0 $(($blocks-1)));
 do
 	# Create progress bar and update it every iteration
-    
+
     let hashes=($blocksize*$i - 1)
     let dots=($barsize-$hashes-1)
-    
+
     progressbar=""
     printCharNTimes $hashes "#"
     printCharNTimes $dots "."
-    
+
     let percentage=($i*100)/$blocks
     printf "Progress: [%3d%%] [%s]\r" "$percentage" "$progressbar"
     sleep $smoothing_time;
-    
-    # Run each command in array and redirect all output to progressbar.log file in current directory
-    $(${commands[$i]} >> progressbar.log 2>&1)
+
+    # Run each command in array and redirect all output to log_file
+    $(${commands[$i]} >> $log_file 2>&1)
 
     retval=$?
-    
+
     #Check for errors and exit in case of failure
     if [ $retval -ne 0 ]
     then
     	echo -ne "\033[2K"
-    	
-    	echo -ne "The command: "${commands[$i]}" has failed with error code $retval. Check progressbar.log for details."
-    	# The script has failed at "$percentage"% due to 
+
+    	echo -ne "The command: "${commands[$i]}" has failed with error code $retval. Check $log_file for details."
+    	# The script has failed at "$percentage"% due to
     	if [ $ignore_errors -eq 1 ]
     	then
     		echo -e " Continuing regardless...\n"
@@ -80,5 +84,3 @@ percentage=100
 printCharNTimes $barsize "#"
 printf "Progress: [%3d%%] [%s]\n" "$percentage" "$progressbar"
 echo Done.
-
-
